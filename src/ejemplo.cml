@@ -1,66 +1,62 @@
-/* Example Context Map written with 'ContextMapper DSL' */
-ContextMap InsuranceContextMap {
-	type = SYSTEM_LANDSCAPE
-	state = TO_BE
-	
-	/* Add bounded contexts to this context map: */
-	contains CustomerManagementContext
-	contains CustomerSelfServiceContext
-	contains PrintingContext
-	contains PolicyManagementContext
-	contains RiskManagementContext
-	contains DebtCollection
-	
-	/* Define the context relationships: */ 
+ContextMap BookEcommerceMap{
+    contains OrdenesContext
+    contains EnviosContext
+    contains GestionClientesContext
+    contains AutorizacionAutenticacionContext
+    contains UbicacionTiendasContext
+    contains ResenasContext
 
-	CustomerSelfServiceContext <- CustomerManagementContext
-	
-	CustomerManagementContext <- PrintingContext
-	
-	PrintingContext -> PolicyManagementContext
-	
-	RiskManagementContext <-> PolicyManagementContext
+    /* Cooperación */
+    OrdenesContext [P]<->[P] EnviosContext
+    OrdenesContext [P]<->[P] GestionClientesContext
 
-	PolicyManagementContext <- CustomerManagementContext
+    /* Shared Kernel */
+    EnviosContext [SK]<->[SK] ResenasContext
+    GestionClientesContext [SK]<->[SK] ResenasContext
 
-	DebtCollection <- PrintingContext
+    /* Customer - Supplier */
+    GestionClientesContext [D]<-[U] AutorizacionAutenticacionContext
 
-	PolicyManagementContext <-> DebtCollection	
+    /* Conformista */
+    GestionClientesContext [CF]<-[CF] AutorizacionAutenticacionContext
+
+    /* Anti-corruption layer */
+    UbicacionTiendasContext [ACL]<->[ACL] EnviosContext
 }
 
-/* Bounded Context Definitions */
-BoundedContext CustomerManagementContext implements CustomerManagementDomain
+BoundedContext OrdenesContext {
+    Module ModuloOrdenes {
+        /* Definir los agregados para el módulo de Órdenes */
+        Aggregate Ordenes {
+            /* Definir entidades, objetos de valor, eventos de dominio, etc */
+            Entity Orden {
+                /* Atributos*/
+                String idOrden
+                String descripcion
+                Date fechaCreacion
+            }
+        }
+    }
+}
 
-BoundedContext CustomerSelfServiceContext implements CustomerManagementDomain
 
-BoundedContext PrintingContext implements PrintingDomain
+BoundedContext EnviosContext {
+    /*Módulos y agregados del subdominio */
+    
+}
 
-BoundedContext PolicyManagementContext implements PolicyManagementDomain
+BoundedContext GestionClientesContext {
+    
+}
 
-BoundedContext RiskManagementContext implements RiskManagementDomain
+BoundedContext AutorizacionAutenticacionContext {
+    
+}
 
-BoundedContext DebtCollection implements DebtsDomain
+BoundedContext UbicacionTiendasContext {
+    
+}
 
-/* Domain & Subdomain Definitions */
-Domain InsuranceDomain {
-	Subdomain CustomerManagementDomain {
-		type = CORE_DOMAIN
-		domainVisionStatement = "Subdomain managing everything customer-related."
-	}
-	Subdomain PolicyManagementDomain {
-		type = CORE_DOMAIN
-		domainVisionStatement = "Subdomain managing contracts and policies."
-	}
-	Subdomain PrintingDomain {
-		type = SUPPORTING_DOMAIN
-		domainVisionStatement = "Service (external system) to solve printing for all kinds of documents (debts, policies, etc.)"
-	}
-	Subdomain RiskManagementDomain {
-		type = GENERIC_SUBDOMAIN
-		domainVisionStatement = "Subdomain supporting everything which relates to risk management."
-	}
-	Subdomain DebtsDomain {
-		type = GENERIC_SUBDOMAIN
-		domainVisionStatement = "Subomain including everything related to the incoming money (debts, dunning, etc.)"
-	}
+BoundedContext ResenasContext {
+    
 }

@@ -4,3 +4,4 @@ vscode:
   extensions:
     - jebbs.plantuml
     - contextmapper.context-mapper-vscode-extension
+    - vscjava.vscode-java-pack
